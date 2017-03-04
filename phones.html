@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html>
+     <!--- Visualization by: Mariama Jaiteh & Khadidja Fares --->
 
+<head>
+    <title> Where should you buy your iPhone and Android? </title>
+     <!--- Load d3.js Library --->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
+</head>
+
+<body>
+    <!---- CSS ---->
+    <style>
+        h1,p,.label{font-family: 'Slabo 27px', serif;}
+        .bar1{fill: orange; }
+        
+        .bar {fill: steelblue;}
+        .axis text {font: 10px sans-serif;}
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke:#000;
+            shape-rendering: crispEdges; }
+        
+        x.axis path {display: none;}
+    </style>
+    <!--- End of CSS --->
+    
+    <h1> Where should you buy your Iphone and Android?</h1>
+    
+    <!--- Legend -->
+    <div style="width:20px;height:20px;border:1px solid #000; background-color: steelblue; "> <p style="display:inline; padding: 30px;"> Iphone</p></div>
+    <br>
+    <div style="width:20px;height:20px;border:1px solid #000; background-color: orange; "> <p style="display:inline; padding: 30px;"> Android</p></div>
+    
+    <!----Javascript --->
+    <script>
+        
+     //Setting the window size!
+     var margin = {top: 20, right:20, bottom:30, left: 40},
+          width = 960 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+    
+     var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+               "translate (" + margin.left + "," + margin.top + ")" );
+        
+   // Define x and y scales
+     var y = d3.scaleLinear()
+        .range([height,0]);
+        
+     var x = d3.scaleBand()
+        .rangeRound([0,width-10], 1)
+        .paddingInner(0,1);
+        
+    //Load external data
+    d3.csv("TechnologyIndex1.csv", function(error, data) {
+        
+        // Convert iphone prices to integers
+        data.forEach(function(d) {
+            d.Country = d.Country
+            d.iPhone = +d.iPhone
+            d.Android = +d.Android
+            
+        });
+        
+        //Add Domains
+        x.domain(data.map(function(d) {return d.Country}));
+        y.domain([0,d3.max(data,function(d){return d.Android})]);
+        
+        
+        //define the axis 
+        var xAxis = d3.axisBottom()
+            .scale(x);
+        var yAxis = d3.axisLeft()
+            .scale(y);
+        
+        
+        //Add axis to the chart
+        svg.append("g")
+            .attr("class", "xaxis")
+            .attr("transform","translate (0," + height + ")")
+            .call(xAxis)
+        svg.append("g")
+            .attr("class", "yaxis")
+            .call(yAxis)
+        
+       // text label for the x axis
+        svg.append("text")      
+        .attr("x", 400 )
+        .attr("y", 200 )
+        .style("text-anchor", "middle")
+        .attr("class", "label")
+        .text("Country");
+        
+        // text label for the y axis
+        svg.append("text") 
+            .attr("text-anchor", "middle") 
+            .attr("transform", "translate("+ (100/5) +","+(height/5)+")rotate(-90)") 
+            .attr("class", "label")
+            .text("Average Price (U.S. Dollars)");
+      
+        // Creating the bar graphs
+        bars = svg.selectAll(".bar").data(data).enter();
+          // iPhone 
+             bars.append("rect")
+             .attr("class", "bar")
+             .attr("x", function(d) {return x(d.Country)+15;})
+             .attr("width", x.bandwidth() -40)
+             .attr("y", function(d){return y(d.iPhone);})
+             .attr("height", function(d){return height - y(d.iPhone);});
+          // Android
+             bars.append("rect")
+              .attr("class", "bar1")
+              .attr("x", function(d) { return x(d.Country) + 25;})
+              .attr("width", x.bandwidth() -40)
+              .attr("y", function(d) { return y(d.Android); })
+              .attr("height", function(d) { return height - y(d.Android); })
+       
+    }); // Done with file
+    
+    </script>
+
+</body>
+    
+</html>
