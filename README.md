@@ -1,2 +1,2 @@
-# D3.JS
-D3 projects
+# Visual Analytics with D3
+
